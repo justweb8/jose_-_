@@ -1,0 +1,1095 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🇵🇪 Resultados 2ª Vuelta — Perú 2026 | ONPE EN VIVO</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+  :root {
+    --s-blue: #1565C0;
+    --s-blue-light: #1E88E5;
+    --s-blue-bg: #E3F2FD;
+    --s-blue-dark: #0D47A1;
+    --k-red: #B71C1C;
+    --k-red-light: #E53935;
+    --k-red-bg: #FFEBEE;
+    --k-red-dark: #7F0000;
+    --gray: #37474F;
+    --bg: #F0F2F5;
+    --card: #FFFFFF;
+    --text: #212121;
+    --text-muted: #757575;
+    --border: rgba(0,0,0,0.09);
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html { scroll-behavior:smooth; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background:var(--bg); color:var(--text); }
+
+  /* NAV */
+  nav {
+    background:#0A1628;
+    padding:0 1.5rem;
+    display:flex; align-items:center; justify-content:space-between;
+    height:54px; position:sticky; top:0; z-index:100;
+    border-bottom:3px solid var(--s-blue);
+    box-shadow:0 2px 12px rgba(0,0,0,0.4);
+  }
+  .nav-brand { color:#fff; font-size:15px; font-weight:700; display:flex; align-items:center; gap:8px; }
+  .nav-text-short { display:none; }
+  .nav-right { display:flex; align-items:center; gap:10px; }
+  .live-pill { display:flex; align-items:center; gap:5px; background:#C62828; color:#fff; font-size:11px; font-weight:800; letter-spacing:1.5px; padding:4px 10px; border-radius:20px; }
+  .live-dot { width:7px; height:7px; border-radius:50%; background:#fff; animation:pulse 1.2s infinite; }
+  @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.5)}}
+  .badge { background:rgba(255,255,255,0.1); color:#B0BEC5; font-size:11px; padding:4px 10px; border-radius:20px; border:1px solid rgba(255,255,255,0.15); }
+  #countdown-badge { background:rgba(21,101,192,0.3); color:#90CAF9; font-size:11px; font-weight:700; padding:4px 10px; border-radius:20px; border:1px solid rgba(21,101,192,0.5); }
+
+  /* HERO */
+  .hero {
+    background:linear-gradient(160deg,#0A1628 0%,#0D2744 60%,#0A1628 100%);
+    padding:2.5rem 1.5rem 2rem; text-align:center;
+    border-bottom:1px solid rgba(255,255,255,0.05);
+  }
+  .hero-flag { font-size:3rem; margin-bottom:0.5rem; }
+  .hero-title { font-size:clamp(1.3rem,3vw,2rem); font-weight:800; color:#ECEFF1; letter-spacing:-0.5px; margin-bottom:4px; }
+  .hero-sub { font-size:13px; color:#78909C; margin-bottom:1.5rem; }
+  .actas-wrap { max-width:600px; margin:0 auto; }
+  .actas-row { display:flex; justify-content:space-between; margin-bottom:8px; }
+  .actas-label { font-size:12px; color:#90A4AE; }
+  .actas-pct { font-size:16px; font-weight:800; color:#64B5F6; }
+  .actas-track { height:10px; background:rgba(255,255,255,0.1); border-radius:5px; overflow:hidden; }
+  .actas-fill { height:100%; background:linear-gradient(90deg,#1565C0,#42A5F5); border-radius:5px; transition:width 2s ease; }
+  .actas-sub { font-size:11px; color:#455A64; margin-top:5px; display:flex; justify-content:space-between; }
+
+  /* MAIN */
+  .main { max-width:1160px; margin:0 auto; padding:1.5rem; }
+  .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:1.25rem; }
+  @media(max-width:700px){.grid-2{grid-template-columns:1fr}}
+  .grid-3 { display:grid; grid-template-columns:repeat(3,1fr); gap:1rem; }
+  @media(max-width:700px){.grid-3{grid-template-columns:1fr 1fr}}
+  .grid-4 { display:grid; grid-template-columns:repeat(4,1fr); gap:0.75rem; }
+  @media(max-width:700px){.grid-4{grid-template-columns:1fr 1fr}}
+
+  /* SECTION TITLE */
+  .section-heading {
+    font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:1.5px;
+    color:var(--text-muted); margin:1.75rem 0 0.9rem;
+    display:flex; align-items:center; gap:10px;
+  }
+  .section-heading::after { content:''; flex:1; height:1px; background:var(--border); }
+
+  /* CANDIDATE CARD */
+  .cand-card {
+    border-radius:16px; padding:1.5rem;
+    position:relative; overflow:hidden;
+    box-shadow:0 2px 12px rgba(0,0,0,0.07);
+    transition:transform 0.2s;
+  }
+  .cand-card:hover { transform:translateY(-2px); }
+  .cand-card.sanchez { background:var(--s-blue-bg); border:2px solid var(--s-blue); }
+  .cand-card.keiko { background:var(--k-red-bg); border:2px solid var(--k-red); }
+  .winning-badge {
+    position:absolute; top:12px; right:12px;
+    font-size:10px; font-weight:800; letter-spacing:.5px;
+    padding:3px 10px; border-radius:20px; text-transform:uppercase;
+  }
+  .sanchez .winning-badge { background:var(--s-blue); color:#fff; }
+  .keiko .winning-badge { background:var(--k-red); color:#fff; }
+  .cand-top { display:flex; align-items:center; gap:14px; margin-bottom:1rem; }
+  .cand-photo {
+    width:72px; height:72px; border-radius:50%; object-fit:cover;
+    flex-shrink:0; border:3px solid #fff;
+    box-shadow:0 2px 8px rgba(0,0,0,0.18);
+  }
+  .sanchez .cand-photo { border-color:var(--s-blue); }
+  .keiko .cand-photo { border-color:var(--k-red); }
+  .cand-info { flex:1; }
+  .cand-name { font-size:17px; font-weight:800; margin-bottom:1px; }
+  .sanchez .cand-name { color:var(--s-blue-dark); }
+  .keiko .cand-name { color:var(--k-red-dark); }
+  .cand-party { font-size:12px; font-weight:600; margin-bottom:3px; }
+  .sanchez .cand-party { color:var(--s-blue); }
+  .keiko .cand-party { color:var(--k-red); }
+  .cand-num { font-size:11px; color:var(--text-muted); }
+  .cand-pct { font-size:56px; font-weight:900; line-height:1; margin-bottom:6px; font-variant-numeric:tabular-nums; }
+  .sanchez .cand-pct { color:var(--s-blue-dark); }
+  .keiko .cand-pct { color:var(--k-red-dark); }
+  .cand-votes { font-size:15px; font-weight:700; }
+  .sanchez .cand-votes { color:var(--s-blue); }
+  .keiko .cand-votes { color:var(--k-red); }
+  .cand-change { font-size:12px; color:var(--text-muted); margin-top:3px; min-height:18px; }
+  .cand-divider { height:1px; background:rgba(0,0,0,0.08); margin:1rem 0; }
+  .cand-detail-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+  .cand-detail { }
+  .cand-detail-label { font-size:10px; text-transform:uppercase; letter-spacing:.5px; color:var(--text-muted); font-weight:600; margin-bottom:2px; }
+  .cand-detail-val { font-size:13px; font-weight:600; color:var(--text); }
+
+  /* DIFF CARD */
+  .diff-card {
+    background:#0A1628; border-radius:16px; padding:1.5rem 2rem;
+    text-align:center; border:1px solid rgba(255,255,255,0.08);
+    box-shadow:0 2px 12px rgba(0,0,0,0.15);
+  }
+  .diff-eyebrow { font-size:10px; text-transform:uppercase; letter-spacing:1.5px; color:#546E7A; margin-bottom:4px; font-weight:700; }
+  .diff-number { font-size:44px; font-weight:900; color:#64B5F6; margin-bottom:2px; font-variant-numeric:tabular-nums; }
+  .diff-who { font-size:14px; color:#90A4AE; font-weight:600; margin-bottom:6px; }
+  .diff-pct { font-size:12px; color:#455A64; }
+  .diff-meta { display:flex; justify-content:center; gap:24px; margin-top:1rem; padding-top:1rem; border-top:1px solid rgba(255,255,255,0.05); }
+  .diff-meta-item { text-align:center; }
+  .diff-meta-label { font-size:10px; color:#455A64; text-transform:uppercase; letter-spacing:.5px; }
+  .diff-meta-val { font-size:15px; font-weight:700; color:#78909C; }
+
+  /* BIG BAR */
+  .big-bar-wrap { margin:1rem 0; }
+  .big-bar-labels { display:flex; justify-content:space-between; margin-bottom:8px; font-size:13px; font-weight:700; }
+  .big-bar-labels .sl { color:var(--s-blue); }
+  .big-bar-labels .kl { color:var(--k-red); }
+  .big-bar-track {
+    width:100%; height:48px; border-radius:8px; overflow:hidden;
+    display:flex; position:relative; background:var(--k-red);
+  }
+  .big-bar-s {
+    height:100%; background:var(--s-blue);
+    display:flex; align-items:center; justify-content:center;
+    font-size:15px; font-weight:800; color:#fff; transition:width 2s ease;
+  }
+  .big-bar-k {
+    height:100%; flex:1;
+    display:flex; align-items:center; justify-content:center;
+    font-size:15px; font-weight:800; color:#fff;
+  }
+  .midline { position:absolute; left:50%; top:0; height:100%; width:2.5px; background:rgba(255,255,255,0.7); z-index:2; }
+  .midline-label { text-align:center; font-size:10px; color:var(--text-muted); margin-top:5px; letter-spacing:.5px; font-weight:600; }
+
+  /* STATS GRID */
+  .stat-card {
+    background:var(--card); border-radius:12px; border:1px solid var(--border);
+    padding:1.1rem 1.25rem; box-shadow:0 1px 4px rgba(0,0,0,0.04);
+  }
+  .stat-label { font-size:11px; color:var(--text-muted); font-weight:600; text-transform:uppercase; letter-spacing:.5px; margin-bottom:5px; }
+  .stat-val { font-size:22px; font-weight:800; color:var(--text); }
+  .stat-sub { font-size:11px; color:var(--text-muted); margin-top:3px; }
+
+  /* CHARTS */
+  .chart-card { background:var(--card); border-radius:12px; border:1px solid var(--border); padding:1.25rem; box-shadow:0 1px 4px rgba(0,0,0,0.04); }
+  .chart-title { font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:var(--text-muted); margin-bottom:1rem; }
+  .chart-wrap { position:relative; width:100%; }
+
+  /* TABLES */
+  .table-card { background:var(--card); border-radius:12px; border:1px solid var(--border); overflow:hidden; box-shadow:0 1px 4px rgba(0,0,0,0.04); }
+  table { width:100%; border-collapse:collapse; font-size:13px; }
+  thead tr { background:#F5F7FA; }
+  th { font-size:10px; text-transform:uppercase; letter-spacing:.6px; color:var(--text-muted); font-weight:700; padding:10px 12px; text-align:left; border-bottom:2px solid var(--border); }
+  td { padding:9px 12px; border-bottom:1px solid var(--border); vertical-align:middle; }
+  tr:last-child td { border-bottom:none; }
+  tbody tr:hover td { background:#FAFBFC; }
+  .s-wins { color:var(--s-blue); font-weight:800; }
+  .k-wins { color:var(--k-red); font-weight:800; }
+  .winner-badge { display:inline-block; font-size:9px; font-weight:800; padding:2px 6px; border-radius:3px; text-transform:uppercase; letter-spacing:.5px; margin-left:4px; }
+  .w-s { background:var(--s-blue-bg); color:var(--s-blue-dark); }
+  .w-k { background:var(--k-red-bg); color:var(--k-red-dark); }
+  .region-bar { height:7px; border-radius:3px; background:var(--k-red); overflow:hidden; min-width:80px; }
+  .region-bar-fill { height:100%; background:var(--s-blue); }
+
+  /* TIMELINE */
+  .tl-latest td { background:linear-gradient(90deg,rgba(21,101,192,0.07),transparent) !important; }
+  .actual-tag { font-size:9px; background:var(--s-blue); color:#fff; padding:1px 5px; border-radius:3px; vertical-align:middle; font-weight:700; margin-left:4px; }
+
+  /* EXTRA INFO CARDS */
+  .info-card { background:var(--card); border-radius:12px; border:1px solid var(--border); padding:1.25rem; box-shadow:0 1px 4px rgba(0,0,0,0.04); }
+  .info-card h3 { font-size:13px; font-weight:800; margin-bottom:0.75rem; display:flex; align-items:center; gap:6px; }
+  .info-row { display:flex; justify-content:space-between; align-items:center; padding:6px 0; border-bottom:1px solid var(--border); font-size:13px; }
+  .info-row:last-child { border-bottom:none; padding-bottom:0; }
+  .info-row-label { color:var(--text-muted); font-size:12px; }
+  .info-row-val { font-weight:700; }
+
+  /* DONUT CHARTS */
+  .donut-wrap { display:flex; align-items:center; gap:1rem; }
+  .donut-legend { flex:1; }
+  .donut-legend-item { display:flex; justify-content:space-between; align-items:center; padding:4px 0; font-size:12px; }
+  .donut-dot { width:10px; height:10px; border-radius:2px; flex-shrink:0; margin-right:6px; }
+
+  /* STATUS BAR */
+  .status-bar {
+    background:var(--card); border-top:1px solid var(--border);
+    padding:0.6rem 1.5rem; display:flex; align-items:center;
+    justify-content:space-between; font-size:11px; color:var(--text-muted);
+    position:sticky; bottom:0; z-index:50;
+  }
+  .status-left { display:flex; align-items:center; gap:8px; }
+  .status-dot { width:7px; height:7px; border-radius:50%; background:#43A047; }
+  .status-dot.error { background:#E53935; }
+  .status-dot.loading { background:#FB8C00; animation:pulse 1s infinite; }
+  .refresh-btn { font-size:11px; color:var(--s-blue); background:none; border:1px solid var(--s-blue); padding:3px 12px; border-radius:10px; cursor:pointer; font-weight:700; }
+  .refresh-btn:hover { background:var(--s-blue); color:#fff; }
+
+  @keyframes slideIn { from{opacity:0;top:54px} to{opacity:1;top:64px} }
+  @keyframes flashGreen { 0%,100%{background:inherit} 35%{background:rgba(67,160,71,0.1)} }
+  .updated { animation:flashGreen 1.5s ease; }
+
+  .scroll-x { overflow-x:auto; }
+  .source-btn { display:inline-flex; align-items:center; gap:6px; font-size:12px; color:var(--s-blue); text-decoration:none; border:1px solid var(--s-blue); padding:5px 14px; border-radius:20px; font-weight:700; transition:all .2s; }
+  .source-btn:hover { background:var(--s-blue); color:#fff; }
+
+  /* PARTIDO COLOR BARS */
+  .partido-s { display:inline-block; width:10px; height:10px; background:var(--s-blue); border-radius:2px; margin-right:4px; vertical-align:middle; }
+  .partido-k { display:inline-block; width:10px; height:10px; background:var(--k-red); border-radius:2px; margin-right:4px; vertical-align:middle; }
+
+  /* ══════════════════════════════════════
+     MOBILE RESPONSIVE — max 480px
+  ══════════════════════════════════════ */
+  @media(max-width:480px) {
+
+    /* NAV */
+    nav { padding:0 0.75rem; height:48px; }
+    .nav-brand { font-size:12px; gap:5px; }
+    .nav-text-full { display:none; }
+    .nav-text-short { display:inline; }
+    .badge { display:none; }
+    #countdown-badge { font-size:10px; padding:3px 7px; }
+    .live-pill { font-size:10px; padding:3px 7px; letter-spacing:1px; }
+
+    /* HERO */
+    .hero { padding:1.5rem 1rem 1.25rem; }
+    .hero-flag { font-size:2.2rem; }
+    .hero-title { font-size:1.05rem; letter-spacing:0; }
+    .hero-sub { font-size:11px; margin-bottom:1rem; }
+    .actas-pct { font-size:14px; }
+    .actas-sub { font-size:10px; flex-direction:column; gap:2px; }
+
+    /* MAIN padding */
+    .main { padding:0.75rem; }
+    .section-heading { font-size:10px; margin:1.25rem 0 0.6rem; }
+
+    /* GRIDS → 1 columna en móvil */
+    .grid-2, .grid-3, .grid-4 { grid-template-columns:1fr !important; gap:0.75rem; }
+
+    /* CANDIDATE CARDS */
+    .cand-card { padding:1rem; border-radius:12px; }
+    .cand-top { gap:10px; margin-bottom:0.75rem; }
+    .cand-photo { width:56px; height:56px; }
+    .cand-name { font-size:14px; }
+    .cand-party { font-size:11px; }
+    .cand-num { font-size:10px; }
+    .cand-pct { font-size:42px; margin-bottom:4px; }
+    .cand-votes { font-size:13px; }
+    .cand-change { font-size:11px; }
+    .cand-divider { margin:0.75rem 0; }
+    .cand-detail-label { font-size:9px; }
+    .cand-detail-val { font-size:12px; }
+    .winning-badge { font-size:9px; padding:2px 7px; top:8px; right:8px; }
+
+    /* DIFF CARD */
+    .diff-card { padding:1rem; border-radius:12px; }
+    .diff-number { font-size:32px; }
+    .diff-who { font-size:12px; }
+    .diff-pct { font-size:11px; }
+    .diff-meta { gap:12px; flex-wrap:wrap; justify-content:space-around; }
+    .diff-meta-val { font-size:13px; }
+    .diff-meta-label { font-size:9px; }
+
+    /* BIG BAR */
+    .big-bar-labels { font-size:11px; flex-wrap:wrap; gap:2px; }
+    .big-bar-labels span:nth-child(2) { width:100%; text-align:center; font-size:10px; order:3; }
+    .big-bar-track { height:40px; }
+    .big-bar-s, .big-bar-k { font-size:12px; }
+    .midline-label { font-size:9px; }
+
+    /* STAT CARDS */
+    .stat-card { padding:0.85rem 1rem; }
+    .stat-val { font-size:18px; }
+    .stat-label { font-size:10px; }
+    .stat-sub { font-size:10px; }
+
+    /* CHARTS */
+    .chart-card { padding:0.85rem; }
+    .chart-title { font-size:10px; margin-bottom:0.6rem; }
+    .chart-wrap canvas { max-height:180px; }
+    .donut-wrap { flex-direction:column; align-items:center; }
+    .donut-wrap .chart-wrap { width:150px !important; height:150px !important; }
+    .donut-legend-item { font-size:11px; }
+
+    /* TABLES */
+    table { font-size:11px; }
+    th { font-size:9px; padding:7px 8px; }
+    td { padding:7px 8px; }
+    .winner-badge { font-size:8px; padding:1px 4px; }
+    .region-bar { min-width:50px; }
+
+    /* INFO CARDS */
+    .info-card { padding:1rem; }
+    .info-card h3 { font-size:12px; }
+    .info-row { font-size:12px; }
+    .info-row-label { font-size:11px; }
+
+    /* STATUS BAR */
+    .status-bar { padding:0.5rem 0.75rem; flex-wrap:wrap; gap:6px; }
+    #fetch-count { display:none; }
+    .refresh-btn { font-size:10px; padding:4px 10px; }
+
+    /* FOOTER */
+    #footer-updated { font-size:11px; }
+    .source-btn { font-size:11px; padding:4px 12px; }
+  }
+
+  /* TABLET — 481px a 700px */
+  @media(min-width:481px) and (max-width:700px) {
+    nav { padding:0 1rem; }
+    .nav-brand { font-size:13px; }
+    .hero { padding:2rem 1rem 1.5rem; }
+    .main { padding:1rem; }
+    .grid-2 { grid-template-columns:1fr !important; }
+    .grid-3 { grid-template-columns:1fr 1fr !important; }
+    .grid-4 { grid-template-columns:1fr 1fr !important; }
+    .cand-pct { font-size:48px; }
+    .diff-number { font-size:36px; }
+    .diff-meta { gap:16px; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-brand">
+    <span>🇵🇪</span>
+    <span class="nav-text-full">Elecciones Perú 2026 — Segunda Vuelta</span>
+    <span class="nav-text-short">Perú 2026 · 2ª Vuelta</span>
+  </div>
+  <div class="nav-right">
+    <div class="live-pill"><div class="live-dot"></div> EN VIVO</div>
+    <span id="countdown-badge">Cargando...</span>
+    <span class="badge" id="last-update-nav">—</span>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="hero-flag">🇵🇪</div>
+  <h1 class="hero-title">Segunda Elección Presidencial — 7 de junio 2026</h1>
+  <p class="hero-sub">Conteo oficial ONPE &middot; 92,766 mesas &middot; 10,313 locales &middot; 27,000,000+ electores habilitados</p>
+  <div class="actas-wrap">
+    <div class="actas-row">
+      <span class="actas-label">📋 Actas procesadas</span>
+      <span class="actas-pct" id="actas-pct-hero">97.916%</span>
+    </div>
+    <div class="actas-track">
+      <div class="actas-fill" id="actas-fill" style="width:97.916%"></div>
+    </div>
+    <div class="actas-sub">
+      <span id="actas-detail-l">88,321 actas contabilizadas</span>
+      <span id="actas-detail-r">1,902 pendientes al JEE</span>
+    </div>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- CANDIDATE CARDS -->
+  <div class="section-heading">🗳️ Resultado actual — votos válidos</div>
+  <div class="grid-2" id="cand-cards">
+
+    <div class="cand-card sanchez" id="card-sanchez">
+      <span class="winning-badge" id="badge-s" style="display:none">▲ Va ganando</span>
+      <div class="cand-top">
+        <img class="cand-photo" src="data:image/png;base64,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" alt="Roberto Sánchez Palomino">
+        <div class="cand-info">
+          <div class="cand-name">Roberto Sánchez Palomino</div>
+          <div class="cand-party"><span class="partido-s"></span>Juntos por el Perú</div>
+          <div class="cand-num">N.° en cédula: 7 · Candidato presidencial</div>
+        </div>
+      </div>
+      <div class="cand-pct" id="pct-s">50.027%</div>
+      <div class="cand-votes" id="votes-s">9,018,592 votos</div>
+      <div class="cand-change" id="change-s"></div>
+      <div class="cand-divider"></div>
+      <div class="cand-detail-grid">
+        <div class="cand-detail">
+          <div class="cand-detail-label">1ª Vuelta (abr)</div>
+          <div class="cand-detail-val" style="color:var(--s-blue)">12.04%</div>
+        </div>
+        <div class="cand-detail">
+          <div class="cand-detail-label">Votos 1ª vuelta</div>
+          <div class="cand-detail-val">2,015,114</div>
+        </div>
+        <div class="cand-detail">
+          <div class="cand-detail-label">Posición 1ª V.</div>
+          <div class="cand-detail-val">2.° lugar</div>
+        </div>
+        <div class="cand-detail">
+          <div class="cand-detail-label">Ventaja s/ 3.°</div>
+          <div class="cand-detail-val">~0.3 pp</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cand-card keiko" id="card-keiko">
+      <span class="winning-badge" id="badge-k" style="display:none">▲ Va ganando</span>
+      <div class="cand-top">
+        <img class="cand-photo" src="data:image/png;base64,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" alt="Keiko Fujimori Higuchi">
+        <div class="cand-info">
+          <div class="cand-name">Keiko Sofía Fujimori Higuchi</div>
+          <div class="cand-party"><span class="partido-k"></span>Fuerza Popular</div>
+          <div class="cand-num">N.° en cédula: 3 · Candidata presidencial</div>
+        </div>
+      </div>
+      <div class="cand-pct" id="pct-k">49.973%</div>
+      <div class="cand-votes" id="votes-k">9,008,804 votos</div>
+      <div class="cand-change" id="change-k"></div>
+      <div class="cand-divider"></div>
+      <div class="cand-detail-grid">
+        <div class="cand-detail">
+          <div class="cand-detail-label">1ª Vuelta (abr)</div>
+          <div class="cand-detail-val" style="color:var(--k-red)">17.19%</div>
+        </div>
+        <div class="cand-detail">
+          <div class="cand-detail-label">Votos 1ª vuelta</div>
+          <div class="cand-detail-val">2,877,678</div>
+        </div>
+        <div class="cand-detail">
+          <div class="cand-detail-label">Posición 1ª V.</div>
+          <div class="cand-detail-val">1.° lugar</div>
+        </div>
+        <div class="cand-detail">
+          <div class="cand-detail-label">Ventaja s/ 2.°</div>
+          <div class="cand-detail-val">5.1 pp</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DIFF -->
+  <div class="diff-card" id="diff-section" style="margin-top:1.25rem">
+    <div class="diff-eyebrow">Diferencia actual entre candidatos</div>
+    <div class="diff-number" id="diff-number">+9,788 votos</div>
+    <div class="diff-who" id="diff-who">▲ Roberto Sánchez lleva la ventaja</div>
+    <div class="diff-pct" id="diff-pct-gap">0.054 puntos porcentuales de diferencia</div>
+    <div class="diff-meta">
+      <div class="diff-meta-item">
+        <div class="diff-meta-label">Total votos válidos</div>
+        <div class="diff-meta-val" id="dm-total">18,023,617</div>
+      </div>
+      <div class="diff-meta-item">
+        <div class="diff-meta-label">Votos en blanco</div>
+        <div class="diff-meta-val" id="dm-blanco">0.60%</div>
+      </div>
+      <div class="diff-meta-item">
+        <div class="diff-meta-label">Votos viciados</div>
+        <div class="diff-meta-val" id="dm-viciado">5.93%</div>
+      </div>
+      <div class="diff-meta-item">
+        <div class="diff-meta-label">Actas pendientes</div>
+        <div class="diff-meta-val" id="dm-pendientes">~1,902</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BIG BAR -->
+  <div class="big-bar-wrap">
+    <div class="big-bar-labels">
+      <span class="sl" id="bar-label-s">Sánchez — 50.027%</span>
+      <span style="font-size:11px;color:var(--text-muted);">50.000% &mdash; Mínimo para ganar</span>
+      <span class="kl" id="bar-label-k">49.973% — Fujimori</span>
+    </div>
+    <div class="big-bar-track">
+      <div class="big-bar-s" id="bigbar-s" style="width:50.027%">50.027%</div>
+      <div class="big-bar-k" id="bigbar-k">49.973%</div>
+      <div class="midline"></div>
+    </div>
+    <div class="midline-label">▲ Línea del 50% — quien supere esta marca gana la presidencia</div>
+  </div>
+
+  <!-- STATS 4-COL -->
+  <div class="section-heading">📊 Estadísticas generales del escrutinio</div>
+  <div class="grid-4">
+    <div class="stat-card">
+      <div class="stat-label">Total votos emitidos</div>
+      <div class="stat-val">19.28M</div>
+      <div class="stat-sub">de ~27M electores habilitados</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Participación</div>
+      <div class="stat-val">71.4%</div>
+      <div class="stat-sub">~7.5M peruanos no votaron</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Votos en blanco</div>
+      <div class="stat-val">0.60%</div>
+      <div class="stat-sub">~115,000 votos</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Votos viciados</div>
+      <div class="stat-val">5.93%</div>
+      <div class="stat-sub">~1,143,000 votos nulos</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Actas procesadas</div>
+      <div class="stat-val" id="stat-actas">97.916%</div>
+      <div class="stat-sub" id="stat-actas-sub">88,321 de 90,223</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Mesas habilitadas</div>
+      <div class="stat-val">92,766</div>
+      <div class="stat-sub">en 10,313 locales</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Mesas en el exterior</div>
+      <div class="stat-val">2,548</div>
+      <div class="stat-sub">Fujimori lidera exterior 56.7%</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Diferencia porcentual</div>
+      <div class="stat-val" id="stat-diffpct" style="color:var(--s-blue)">0.060 pp</div>
+      <div class="stat-sub">margen histórico</div>
+    </div>
+  </div>
+
+  <!-- CHARTS -->
+  <div class="section-heading">📈 Evolución del escrutinio</div>
+  <div class="grid-2">
+    <div class="chart-card">
+      <div class="chart-title">Ventaja en votos — avance de actas</div>
+      <div class="chart-wrap" style="height:230px">
+        <canvas id="evoChart" role="img" aria-label="Evolución de diferencia de votos"></canvas>
+      </div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">% de votos válidos por candidato</div>
+      <div class="chart-wrap" style="height:230px">
+        <canvas id="pctChart" role="img" aria-label="Porcentaje votos candidatos"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- DONUT + INFO -->
+  <div class="section-heading">🥧 Distribución de votos emitidos</div>
+  <div class="grid-2">
+    <div class="chart-card">
+      <div class="chart-title">Composición del voto total</div>
+      <div class="donut-wrap" style="align-items:center">
+        <div class="chart-wrap" style="height:180px;width:180px;flex-shrink:0">
+          <canvas id="donutChart" role="img" aria-label="Composición votos"></canvas>
+        </div>
+        <div class="donut-legend">
+          <div class="donut-legend-item"><span><span class="donut-dot" style="background:#1565C0;display:inline-block"></span>Sánchez</span><strong style="color:var(--s-blue)">46.8%</strong></div>
+          <div class="donut-legend-item"><span><span class="donut-dot" style="background:#B71C1C;display:inline-block"></span>Fujimori</span><strong style="color:var(--k-red)">46.7%</strong></div>
+          <div class="donut-legend-item"><span><span class="donut-dot" style="background:#E0E0E0;display:inline-block"></span>En blanco</span><strong style="color:#757575">0.6%</strong></div>
+          <div class="donut-legend-item"><span><span class="donut-dot" style="background:#BDBDBD;display:inline-block"></span>Viciados</span><strong style="color:#757575">5.9%</strong></div>
+        </div>
+      </div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Resultado en regiones clave</div>
+      <div class="chart-wrap" style="height:180px">
+        <canvas id="regionChart" role="img" aria-label="Resultados por región"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- TIMELINE TABLE -->
+  <div class="section-heading">🕐 Historial de reportes oficiales ONPE</div>
+  <div class="table-card scroll-x">
+    <table style="min-width:620px">
+      <thead><tr>
+        <th>Hora</th>
+        <th>% Actas</th>
+        <th style="color:var(--s-blue)">Sánchez %</th>
+        <th style="color:var(--k-red)">Fujimori %</th>
+        <th>Diferencia</th>
+        <th>Votos Sánchez</th>
+        <th>Votos Fujimori</th>
+      </tr></thead>
+      <tbody id="timeline-body"></tbody>
+    </table>
+  </div>
+
+  <!-- REGIONS TABLE -->
+  <div class="section-heading">🗺️ Resultados por departamento</div>
+  <div class="table-card scroll-x">
+    <table style="min-width:520px">
+      <thead><tr>
+        <th>Departamento</th>
+        <th style="color:var(--s-blue)">Sánchez</th>
+        <th style="color:var(--k-red)">Fujimori</th>
+        <th>Diferencia</th>
+        <th>% Actas</th>
+        <th>Distribución visual</th>
+      </tr></thead>
+      <tbody id="regions-body"></tbody>
+    </table>
+  </div>
+
+  <!-- EXTRA INFO ROW -->
+  <div class="section-heading">📋 Información adicional del proceso</div>
+  <div class="grid-3">
+    <div class="info-card">
+      <h3>🗳️ Datos del proceso</h3>
+      <div class="info-row"><span class="info-row-label">Fecha segunda vuelta</span><span class="info-row-val">7 junio 2026</span></div>
+      <div class="info-row"><span class="info-row-label">Cierre de mesas</span><span class="info-row-val">5:00 p.m.</span></div>
+      <div class="info-row"><span class="info-row-label">Primeros resultados</span><span class="info-row-val">8:30 p.m. (día E)</span></div>
+      <div class="info-row"><span class="info-row-label">Electores habilitados</span><span class="info-row-val">27,038,004</span></div>
+      <div class="info-row"><span class="info-row-label">Departamentos</span><span class="info-row-val">25 + Callao + Ext.</span></div>
+    </div>
+    <div class="info-card">
+      <h3>📉 Primera vuelta — contexto</h3>
+      <div class="info-row"><span class="info-row-label">Candidatos en 1ª V.</span><span class="info-row-val">35 candidatos</span></div>
+      <div class="info-row"><span class="info-row-label">Fujimori (1.° lugar)</span><span class="info-row-val" style="color:var(--k-red)">17.19%</span></div>
+      <div class="info-row"><span class="info-row-label">Sánchez (2.° lugar)</span><span class="info-row-val" style="color:var(--s-blue)">12.04%</span></div>
+      <div class="info-row"><span class="info-row-label">López Aliaga (3.°)</span><span class="info-row-val">~11.7%</span></div>
+      <div class="info-row"><span class="info-row-label">Fecha primera vuelta</span><span class="info-row-val">12 abril 2026</span></div>
+    </div>
+    <div class="info-card">
+      <h3>⚖️ Marco legal</h3>
+      <div class="info-row"><span class="info-row-label">Organismo electoral</span><span class="info-row-val">ONPE</span></div>
+      <div class="info-row"><span class="info-row-label">Validación final</span><span class="info-row-val">JNE</span></div>
+      <div class="info-row"><span class="info-row-label">Actas con validez</span><span class="info-row-val">100% (meta)</span></div>
+      <div class="info-row"><span class="info-row-label">Voto obligatorio</span><span class="info-row-val">Sí (18–70 años)</span></div>
+      <div class="info-row"><span class="info-row-label">Próx. mandato</span><span class="info-row-val">2026–2031</span></div>
+    </div>
+  </div>
+
+  <div style="margin-top:2rem;padding-top:1rem;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+    <div style="font-size:12px;color:var(--text-muted)" id="footer-updated">Cargando...</div>
+    <a href="https://resultadosegundavuelta.onpe.gob.pe/main/resumen" target="_blank" class="source-btn">🔗 Ver fuente oficial ONPE</a>
+  </div>
+
+</div><!-- /main -->
+
+<div class="status-bar">
+  <div class="status-left">
+    <div class="status-dot" id="status-dot"></div>
+    <span id="status-text">Iniciando...</span>
+  </div>
+  <div style="display:flex;align-items:center;gap:10px">
+    <span id="fetch-count" style="font-size:11px;color:var(--text-muted)">—</span>
+    <button class="refresh-btn" onclick="forceRefresh()">⟳ Actualizar ahora</button>
+  </div>
+</div>
+
+<script>
+// ── CONSTANTS ──
+const TOTAL_ACTAS = 92766;  // Total actas oficiales ONPE 2026
+
+// ── STATE ──
+const REFRESH_SEC = 30;  // Actualiza cada 30 segundos
+let countdown = REFRESH_SEC;
+let refreshCount = 0;
+
+let historySeries = [
+  {t:"Dom 7jun 20:30", actas:5.0,  s:44.20, k:55.80, diff:-68000, sv:180000, kv:228000},
+  {t:"Dom 7jun 21:00", actas:12.3, s:47.10, k:52.90, diff:-45000, sv:385000, kv:430000},
+  {t:"Dom 7jun 22:00", actas:35.6, s:49.20, k:50.80, diff:-60000, sv:1280000,kv:1340000},
+  {t:"Dom 7jun 23:00", actas:55.2, s:51.40, k:48.60, diff:98000,  sv:1980000,kv:1882000},
+  {t:"Dom 7jun 24:00", actas:67.4, s:52.10, k:47.90, diff:146000, sv:2530000,kv:2384000},
+  {t:"Lun 8jun 01:00", actas:74.8, s:52.33, k:47.67, diff:160000, sv:3150000,kv:2874000},
+  {t:"Lun 8jun 08:00", actas:94.8, s:50.09, k:49.91, diff:30439,  sv:8901069,kv:8874597},
+  {t:"Lun 8jun 19:50", actas:95.2, s:50.12, k:49.88, diff:41057,  sv:8910000,kv:8869000},
+  {t:"Lun 8jun 22:00", actas:95.7, s:50.07, k:49.93, diff:26472,  sv:8901069,kv:8874597},
+  {t:"Mar 9jun 07:30", actas:95.9, s:50.06, k:49.94, diff:20637,  sv:8909775,kv:8889138},
+  {t:"Mar 9jun 14:00", actas:97.0, s:50.07, k:49.93, diff:25392,  sv:8960000,kv:8935000},
+  {t:"Mar 9jun 21:00", actas:97.7, s:50.03, k:49.97, diff:8509,   sv:9007000,kv:8999000},
+  {t:"Mié 10jun 14:52",actas:97.89, s:50.030,k:49.970,diff:9269,  sv:9016443,kv:9007174},
+  {t:"Mié 10jun 18:15",actas:97.916,s:50.027,k:49.973,diff:9788,  sv:9018592,kv:9008804},
+];
+
+const regionData = [
+  {name:"Lima Metropolitana",s:42.10,k:57.90,actas:98.1},
+  {name:"Callao",            s:34.40,k:65.60,actas:97.7},
+  {name:"Cajamarca",         s:66.77,k:33.23,actas:99.4},
+  {name:"La Libertad",       s:42.48,k:57.52,actas:99.3},
+  {name:"Puno",              s:71.20,k:28.80,actas:98.6},
+  {name:"Cusco",             s:63.40,k:36.60,actas:97.9},
+  {name:"Arequipa",          s:45.80,k:54.20,actas:98.5},
+  {name:"Junín",             s:54.10,k:45.90,actas:97.2},
+  {name:"Piura",             s:48.30,k:51.70,actas:98.0},
+  {name:"Ancash",            s:52.60,k:47.40,actas:97.4},
+  {name:"Lambayeque",        s:44.10,k:55.90,actas:98.2},
+  {name:"Ica",               s:39.50,k:60.50,actas:99.1},
+  {name:"Loreto",            s:58.30,k:41.70,actas:95.8},
+  {name:"San Martín",        s:55.20,k:44.80,actas:97.6},
+  {name:"Ucayali",           s:50.80,k:49.20,actas:96.4},
+  {name:"Huánuco",           s:60.10,k:39.90,actas:96.9},
+  {name:"Tacna",             s:41.20,k:58.80,actas:98.8},
+  {name:"Moquegua",          s:44.60,k:55.40,actas:99.0},
+  {name:"Tumbes",            s:47.80,k:52.20,actas:97.3},
+  {name:"Amazonas",          s:61.40,k:38.60,actas:96.1},
+  {name:"Apurímac",          s:67.90,k:32.10,actas:97.7},
+  {name:"Ayacucho",          s:69.20,k:30.80,actas:98.3},
+  {name:"Huancavelica",      s:64.50,k:35.50,actas:97.8},
+  {name:"Madre de Dios",     s:52.10,k:47.90,actas:95.5},
+  {name:"Pasco",             s:57.30,k:42.70,actas:96.7},
+  {name:"Extranjero",        s:43.26,k:56.74,actas:4.05},
+];
+
+// ── CHARTS ──
+let evoChart, pctChart, donutChart, regionChart;
+
+function initCharts() {
+  const gc = "rgba(0,0,0,0.06)", tc = "#90A4AE";
+
+  // Evo chart
+  evoChart = new Chart(document.getElementById("evoChart").getContext("2d"), {
+    type:"line",
+    data:{
+      labels: historySeries.map(d=>d.t),
+      datasets:[{
+        label:"Ventaja votos",
+        data: historySeries.map(d=>d.diff),
+        borderColor:"#1565C0", backgroundColor:"rgba(21,101,192,0.07)",
+        borderWidth:2.5, fill:true, tension:0.35,
+        pointRadius:3, pointHoverRadius:5, pointBackgroundColor:"#1565C0"
+      }]
+    },
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>(ctx.parsed.y>=0?"+":"")+ctx.parsed.y.toLocaleString("es-PE")+" votos"}}},
+      scales:{
+        x:{ticks:{color:tc,font:{size:9},maxRotation:30},grid:{color:gc}},
+        y:{ticks:{color:tc,font:{size:10},callback:v=>(v>=0?"+":"")+v.toLocaleString("es-PE")},grid:{color:gc}}
+      }
+    }
+  });
+
+  // Pct chart
+  pctChart = new Chart(document.getElementById("pctChart").getContext("2d"), {
+    type:"line",
+    data:{
+      labels: historySeries.map(d=>d.t),
+      datasets:[
+        {label:"Sánchez",data:historySeries.map(d=>d.s),borderColor:"#1565C0",borderWidth:2.5,fill:false,tension:0.3,pointRadius:3,pointBackgroundColor:"#1565C0"},
+        {label:"Fujimori",data:historySeries.map(d=>d.k),borderColor:"#B71C1C",borderWidth:2.5,fill:false,tension:0.3,pointRadius:3,pointBackgroundColor:"#B71C1C",borderDash:[5,3]}
+      ]
+    },
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:true,position:"top",labels:{boxWidth:12,font:{size:11},padding:14}}},
+      scales:{
+        x:{ticks:{color:tc,font:{size:9},maxRotation:30},grid:{color:gc}},
+        y:{min:44,max:56,ticks:{color:tc,font:{size:10},callback:v=>v.toFixed(1)+"%"},grid:{color:gc}}
+      }
+    }
+  });
+
+  // Donut chart
+  donutChart = new Chart(document.getElementById("donutChart").getContext("2d"), {
+    type:"doughnut",
+    data:{
+      labels:["Sánchez","Fujimori","En blanco","Viciados"],
+      datasets:[{
+        data:[46.76,46.71,0.60,5.93],
+        backgroundColor:["#1565C0","#B71C1C","#E0E0E0","#BDBDBD"],
+        borderWidth:2, borderColor:"#fff"
+      }]
+    },
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>ctx.label+": "+ctx.parsed.toFixed(2)+"%"}}}
+    }
+  });
+
+  // Region bar chart
+  const topRegions = regionData.filter(r=>r.name!=="Extranjero").sort((a,b)=>Math.abs(b.s-b.k)-Math.abs(a.s-a.k)).slice(0,8);
+  regionChart = new Chart(document.getElementById("regionChart").getContext("2d"), {
+    type:"bar",
+    data:{
+      labels: topRegions.map(r=>r.name.length>10?r.name.substring(0,10)+"...":r.name),
+      datasets:[
+        {label:"Sánchez",data:topRegions.map(r=>r.s),backgroundColor:"rgba(21,101,192,0.8)",borderRadius:3},
+        {label:"Fujimori",data:topRegions.map(r=>r.k),backgroundColor:"rgba(183,28,28,0.8)",borderRadius:3}
+      ]
+    },
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:true,position:"top",labels:{boxWidth:10,font:{size:10},padding:10}}},
+      scales:{
+        x:{ticks:{color:tc,font:{size:9}},grid:{display:false}},
+        y:{min:25,max:75,ticks:{color:tc,font:{size:9},callback:v=>v+"%"},grid:{color:gc}}
+      }
+    }
+  });
+}
+
+// ── RENDER ──
+function renderUI(data) {
+  const l = data[data.length-1];
+  const prev = data.length>=2?data[data.length-2]:null;
+
+  // Hero
+  document.getElementById("actas-pct-hero").textContent = l.actas.toFixed(3)+"%";
+  document.getElementById("actas-fill").style.width = l.actas+"%";
+  document.getElementById("stat-actas").textContent = l.actas.toFixed(3)+"%";
+  // Update actas count estimate
+  const actasCount = Math.round(TOTAL_ACTAS * l.actas / 100);
+  const actasPend  = TOTAL_ACTAS - actasCount;
+  document.getElementById("actas-detail-l").textContent = actasCount.toLocaleString("es-PE") + " actas contabilizadas";
+  document.getElementById("actas-detail-r").textContent = actasPend.toLocaleString("es-PE") + " pendientes al JEE";
+  const subEl = document.getElementById("stat-actas-sub");
+  if (subEl) subEl.textContent = actasCount.toLocaleString("es-PE") + " de " + TOTAL_ACTAS.toLocaleString("es-PE");
+
+  // Candidates
+  document.getElementById("pct-s").textContent = l.s.toFixed(3)+"%";
+  document.getElementById("pct-k").textContent = l.k.toFixed(3)+"%";
+  document.getElementById("votes-s").textContent = l.sv.toLocaleString("es-PE")+" votos";
+  document.getElementById("votes-k").textContent = l.kv.toLocaleString("es-PE")+" votos";
+
+  if(prev){
+    const ds=l.sv-prev.sv, dk=l.kv-prev.kv;
+    document.getElementById("change-s").textContent = ds>0?"▲ +"+ds.toLocaleString("es-PE")+" desde últ. reporte":"";
+    document.getElementById("change-k").textContent = dk>0?"▲ +"+dk.toLocaleString("es-PE")+" desde últ. reporte":"";
+  }
+
+  // Winning badges
+  const bs=document.getElementById("badge-s"), bk=document.getElementById("badge-k");
+  const cs=document.getElementById("card-sanchez"), ck=document.getElementById("card-keiko");
+  if(l.diff>=0){ bs.style.display="inline"; bk.style.display="none"; }
+  else { bk.style.display="inline"; bs.style.display="none"; }
+
+  // Diff
+  const absDiff=Math.abs(l.diff);
+  document.getElementById("diff-number").textContent=(l.diff>=0?"+":"-")+absDiff.toLocaleString("es-PE")+" votos";
+  document.getElementById("diff-who").textContent=(l.diff>=0?"▲ Roberto Sánchez lleva la ventaja":"▲ Keiko Fujimori lleva la ventaja");
+  document.getElementById("diff-pct-gap").textContent=Math.abs(l.s-l.k).toFixed(3)+" puntos porcentuales de diferencia";
+  document.getElementById("stat-diffpct").textContent=Math.abs(l.s-l.k).toFixed(3)+" pp";
+
+  // Big bar
+  document.getElementById("bigbar-s").style.width=l.s+"%";
+  document.getElementById("bigbar-s").textContent=l.s.toFixed(3)+"%";
+  document.getElementById("bigbar-k").textContent=l.k.toFixed(3)+"%";
+  document.getElementById("bar-label-s").textContent="Sánchez — "+l.s.toFixed(3)+"%";
+  document.getElementById("bar-label-k").textContent=l.k.toFixed(3)+"% — Fujimori";
+
+  // Timestamps
+  const now=new Date().toLocaleString("es-PE",{dateStyle:"medium",timeStyle:"short"});
+  document.getElementById("last-update-nav").textContent=now;
+  document.getElementById("footer-updated").innerHTML="🕐 Última actualización: <strong>"+now+"</strong> · Fuente: ONPE oficial";
+
+  renderTimeline(data);
+  updateCharts(data);
+
+  ["card-sanchez","card-keiko","diff-section"].forEach(id=>{
+    const el=document.getElementById(id);
+    el.classList.remove("updated");void el.offsetWidth;el.classList.add("updated");
+  });
+}
+
+function renderTimeline(data) {
+  const tbody=document.getElementById("timeline-body");
+  tbody.innerHTML="";
+  [...data].reverse().forEach((row,idx)=>{
+    const isLatest=idx===0;
+    const tr=document.createElement("tr");
+    if(isLatest)tr.className="tl-latest";
+    const diffStr=(row.diff>=0?"+":"")+row.diff.toLocaleString("es-PE");
+    const dc=row.diff>=0?"var(--s-blue)":"var(--k-red)";
+    tr.innerHTML=`
+      <td>${row.t}${isLatest?"<span class=\'actual-tag\'>ACTUAL</span>":""}</td>
+      <td style="color:var(--text-muted)">${row.actas.toFixed(2)}%</td>
+      <td class="s-wins">${row.s.toFixed(3)}%</td>
+      <td class="k-wins">${row.k.toFixed(3)}%</td>
+      <td style="font-weight:800;color:${dc}">${diffStr}</td>
+      <td style="font-size:12px;color:var(--text-muted)">${row.sv.toLocaleString("es-PE")}</td>
+      <td style="font-size:12px;color:var(--text-muted)">${row.kv.toLocaleString("es-PE")}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function renderRegions() {
+  const tbody=document.getElementById("regions-body");
+  tbody.innerHTML="";
+  const sorted=[...regionData].sort((a,b)=>b.actas-a.actas);
+  sorted.forEach(r=>{
+    const w=r.s>r.k?"S":"K";
+    const diff=Math.abs(r.s-r.k).toFixed(1);
+    const tr=document.createElement("tr");
+    tr.innerHTML=`
+      <td style="font-weight:600">${r.name}<span class="winner-badge ${w==="S"?"w-s":"w-k"}">${w==="S"?"Sánchez":"Fujimori"}</span></td>
+      <td class="s-wins">${r.s.toFixed(2)}%</td>
+      <td class="k-wins">${r.k.toFixed(2)}%</td>
+      <td style="font-weight:800;color:${w==="S"?"var(--s-blue)":"var(--k-red)"}">+${diff} pp</td>
+      <td style="color:var(--text-muted);font-size:12px">${r.actas.toFixed(1)}%</td>
+      <td style="min-width:100px"><div class="region-bar"><div class="region-bar-fill" style="width:${r.s}%"></div></div></td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function updateCharts(data) {
+  if(!evoChart||!pctChart)return;
+  const labels=data.map(d=>d.t);
+  evoChart.data.labels=labels;
+  evoChart.data.datasets[0].data=data.map(d=>d.diff);
+  evoChart.update("none");
+  pctChart.data.labels=labels;
+  pctChart.data.datasets[0].data=data.map(d=>d.s);
+  pctChart.data.datasets[1].data=data.map(d=>d.k);
+  pctChart.update("none");
+}
+
+// ── FETCH ──
+async function fetchONPE() {
+  setStatus("loading","Consultando ONPE...");
+
+  // Strategy 1: Direct API endpoint (JSON)
+  const apiEndpoints = [
+    "https://resultadosegundavuelta.onpe.gob.pe/main/resumen",
+    "https://resultadosegundavuelta.onpe.gob.pe/main/resultados",
+  ];
+
+  // Strategy 2: CORS proxies
+  const proxies = [
+    url => "https://api.allorigins.win/get?url=" + encodeURIComponent(url),
+    url => "https://corsproxy.io/?" + encodeURIComponent(url),
+    url => "https://thingproxy.freeboard.io/fetch/" + url,
+  ];
+
+  for (const endpoint of apiEndpoints) {
+    for (const makeProxy of proxies) {
+      const proxyUrl = makeProxy(endpoint);
+      try {
+        const r = await fetch(proxyUrl, { signal: AbortSignal.timeout(12000) });
+        if (!r.ok) continue;
+        const raw = proxyUrl.includes("allorigins") ? (await r.json()).contents : await r.text();
+        if (!raw || raw.length < 100) continue;
+        const parsed = parseONPE(raw);
+        if (parsed) {
+          applyData(parsed);
+          return true;
+        }
+      } catch(e) { console.warn("proxy fail:", e.message); }
+    }
+  }
+
+  setStatus("error","Sin conexión · Mostrando últimos datos");
+  renderUI(historySeries);
+  return false;
+}
+
+function parseONPE(raw) {
+  if (!raw || raw.length < 50) return null;
+  try {
+    // Try JSON first
+    let json = null;
+    try { json = JSON.parse(raw); } catch(e) {}
+    if (json) {
+      // Try known ONPE JSON shapes
+      const s = json.porcentajeCandidato1 || json.pct1 || json.candidato1?.porcentaje;
+      const k = json.porcentajeCandidato2 || json.pct2 || json.candidato2?.porcentaje;
+      const actas = json.porcentajeActas || json.actasProcesadas || json.actas;
+      if (s && k && actas) {
+        const total = 18027396;
+        const sv = Math.round(total * s / 100);
+        const kv = Math.round(total * k / 100);
+        return { actas: parseFloat(actas), s: parseFloat(s), k: parseFloat(k), diff: sv - kv, sv, kv };
+      }
+    }
+
+    // HTML scraping — extract all percentage-looking numbers
+    // Matches: 50.030% · 97.916% · 49,970% etc.
+    const allPcts = [...raw.matchAll(/(\d{1,3})[.,](\d{2,3})\s*%/g)]
+      .map(m => parseFloat(m[0].replace(",",".")))
+      .filter(v => !isNaN(v));
+
+    if (allPcts.length < 3) return null;
+
+    // Candidate percentages: values between 40–60
+    const candPcts = allPcts.filter(v => v > 40 && v < 60);
+    if (candPcts.length < 2) return null;
+
+    // Two main candidates are likely the two closest values that sum ~100
+    let bestPair = null, bestDiff = 999;
+    for (let i = 0; i < candPcts.length; i++) {
+      for (let j = i+1; j < candPcts.length; j++) {
+        const diff = Math.abs(candPcts[i] + candPcts[j] - 100);
+        if (diff < bestDiff) { bestDiff = diff; bestPair = [candPcts[i], candPcts[j]]; }
+      }
+    }
+    if (!bestPair || bestDiff > 2) return null;
+
+    const s = Math.max(...bestPair);
+    const k = Math.min(...bestPair);
+
+    // Actas percentage: values between 85–100 (not candidate range)
+    const actasCandidates = allPcts.filter(v => v > 85 && v <= 100);
+    const lastKnown = historySeries[historySeries.length - 1].actas;
+    // Pick the largest value >= lastKnown (actas only go up)
+    const actas = actasCandidates.filter(v => v >= lastKnown - 0.5).sort((a,b) => b - a)[0]
+                  || lastKnown;
+
+    // Try to extract exact vote numbers (ONPE shows "9'018,592 votos" or "9.018.592")
+    const voteNums = [...raw.matchAll(/(\d[\d'.,]{6,10})\s*votos/gi)]
+      .map(m => parseInt(m[1].replace(/['.,']/g,"")))
+      .filter(v => v > 8000000 && v < 12000000)
+      .sort((a,b) => b - a);
+
+    let sv, kv;
+    if (voteNums.length >= 2) {
+      sv = voteNums[0]; kv = voteNums[1];
+    } else {
+      sv = Math.round(18027396 * s / 100);
+      kv = Math.round(18027396 * k / 100);
+    }
+    return { actas, s, k, diff: sv - kv, sv, kv };
+  } catch(e) { console.warn("parseONPE error:", e); return null; }
+}
+
+function applyData(p){
+  const last = historySeries[historySeries.length-1];
+  const changed = Math.abs(p.actas - last.actas) > 0.001 || Math.abs(p.s - last.s) > 0.001;
+  if (changed) {
+    const t = new Date().toLocaleString("es-PE",{month:"short",day:"numeric",hour:"2-digit",minute:"2-digit"});
+    historySeries.push({t, ...p});
+    if (historySeries.length > 30) historySeries.shift();
+    showUpdateAlert(p, last);
+  }
+  renderUI(historySeries);
+  refreshCount++;
+  document.getElementById("fetch-count").textContent = "Consultas ONPE: " + refreshCount + (changed ? " · ✅ DATO NUEVO" : " · sin cambios");
+  setStatus("ok", changed ? "✅ Dato actualizado desde ONPE" : "Conectado · sin cambios · actualiza en "+REFRESH_SEC+"s");
+}
+
+function showUpdateAlert(nuevo, anterior) {
+  const existing = document.getElementById("update-alert");
+  if (existing) existing.remove();
+  const div = document.createElement("div");
+  div.id = "update-alert";
+  div.style.cssText = "position:fixed;top:64px;left:50%;transform:translateX(-50%);background:#1B5E20;color:#fff;padding:10px 24px;border-radius:8px;font-size:13px;font-weight:700;z-index:999;box-shadow:0 4px 16px rgba(0,0,0,0.3);animation:slideIn .3s ease";
+  div.innerHTML = `✅ ONPE actualizó: ${nuevo.actas.toFixed(3)}% actas · Sánchez ${nuevo.s.toFixed(3)}% · Fujimori ${nuevo.k.toFixed(3)}%`;
+  document.body.appendChild(div);
+  setTimeout(() => div.style.opacity = "0", 4000);
+  setTimeout(() => div.remove(), 4500);
+}
+
+function setStatus(state,text){
+  const dot=document.getElementById("status-dot");
+  dot.className="status-dot"+(state!=="ok"?" "+state:"");
+  document.getElementById("status-text").textContent=text;
+}
+
+let cdTimer=null;
+function startCountdown(){
+  countdown=REFRESH_SEC;
+  if(cdTimer)clearInterval(cdTimer);
+  const badge=document.getElementById("countdown-badge");
+  cdTimer=setInterval(()=>{
+    countdown--;
+    if(countdown<=0){
+      clearInterval(cdTimer);
+      badge.textContent="Actualizando...";
+      fetchONPE().then(()=>startCountdown());
+    }else{
+      badge.textContent="Actualiza en "+countdown+"s";
+    }
+  },1000);
+}
+
+function forceRefresh(){
+  if(cdTimer)clearInterval(cdTimer);
+  document.getElementById("countdown-badge").textContent="Actualizando...";
+  fetchONPE().then(()=>startCountdown());
+}
+
+// ── INIT ──
+document.addEventListener("DOMContentLoaded",()=>{
+  initCharts();
+  renderUI(historySeries);
+  renderRegions();
+  fetchONPE().then(()=>startCountdown());
+});
+</script>
+</body>
+</html>
