@@ -1,9 +1,18 @@
 {
   "actas": 97.982,
+  "contabilizadas": 90894,
+  "totalActas": 92766,
+  "pendientesJee": 1618,
+  "actasEnvJee": 1.744,
   "s": 50.019,
   "k": 49.981,
   "sv": 9020928,
   "kv": 9014171,
   "diff": 6757,
-  "timestamp": "2026-06-11T01:05:56Z"
+  "totalVotosValidos": 18035099,
+  "totalVotosEmitidos": 19295521,
+  "participacion": 70.614,
+  "pctBlancos": 0.0,
+  "pctViciados": 0.0,
+  "timestamp": "2026-06-11T01:40:24Z"
 }
