@@ -2,7 +2,8 @@
   "actas": 97.982,
   "contabilizadas": 90894,
   "totalActas": 92766,
-  "pendientesJee": 1618,
+  "pendientesJee": 254,
+  "enviadasJee": 1618,
   "actasEnvJee": 1.744,
   "s": 50.019,
   "k": 49.981,
@@ -14,5 +15,5 @@
   "participacion": 70.614,
   "pctBlancos": 0.0,
   "pctViciados": 0.0,
-  "timestamp": "2026-06-11T01:40:24Z"
+  "timestamp": "2026-06-11T01:52:50Z"
 }
