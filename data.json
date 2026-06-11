@@ -1,19 +1,19 @@
 {
-  "actas": 98.239,
-  "contabilizadas": 91132,
+  "actas": 98.241,
+  "contabilizadas": 91134,
   "totalActas": 92766,
-  "pendientesJee": 11,
+  "pendientesJee": 9,
   "enviadasJee": 1623,
   "actasEnvJee": 1.75,
   "s": 49.998,
   "k": 50.002,
-  "sv": 9033312,
-  "kv": 9034071,
-  "diff": 759,
-  "totalVotosValidos": 18067383,
-  "totalVotosEmitidos": 19330694,
+  "sv": 9033489,
+  "kv": 9034073,
+  "diff": 584,
+  "totalVotosValidos": 18067562,
+  "totalVotosEmitidos": 19330887,
   "participacion": 70.743,
   "pctBlancos": 0.0,
   "pctViciados": 0.0,
-  "timestamp": "2026-06-11T19:53:53Z"
+  "timestamp": "2026-06-11T21:19:08Z"
 }
